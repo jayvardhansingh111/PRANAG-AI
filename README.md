@@ -1,101 +1,113 @@
-#  PRANAG-AI
+# PRANAG-AI
 #  AI-Powered Crop Specification System
 
 ## Overview
 
-Converts natural language agricultural prompts into validated JSON specifications
-used by simulation systems to model crop performance under various conditions.
+AgriAI converts natural language agricultural prompts into validated JSON crop
+specifications. The pipeline combines:
 
-```
-User Prompt
-    ↓
-Orchestrator (AI Brain)     ← LLM + LangGraph + Research APIs
-    ↓
-Search Engine (Data Layer)  ← Sentence Transformers + ChromaDB
-    ↓
-Orchestrator (Final JSON)   ← Pydantic validation + spec.json
-    ↓
-Simulation System           ← Receives validated spec.json
-```
+- LLM prompt parsing
+- semantic trait search
+- scientific research retrieval
+- Pydantic schema validation
+- Streamlit testing UI
+
+It is designed to produce machine-readable `spec.json` output for downstream
+simulation and decision-support systems.
 
 ---
 
-## Project Structure
+## Key Components
 
-```
-agri-ai-pipeline/
-├── orchestrator/
-│   ├── prompt_parser.py        # LLM: raw prompt → structured data
-│   ├── workflow.py             # LangGraph: retry + state machine
-│   ├── research_fetcher.py     # Semantic Scholar + ArXiv API
-│   ├── output_validator.py     # Pydantic strict validation
-│   └── spec_builder.py         # Final combiner → spec.json
-│
-├── search_engine/
-│   ├── embeddings.py           # Sentence Transformers: text → vectors
-│   ├── vector_store.py         # ChromaDB: store + retrieve 1M+ traits
-│   ├── similarity_search.py    # <50ms semantic search API
-│   └── data_cleaner.py         # Clean + normalize raw trait data
-│
-├── shared/
-│   ├── models.py               # Pydantic models (shared schema)
-│   └── config.py               # Environment variables
-│
-├── ui/
-│   └── app.py                  # Streamlit testing interface
-│
-├── tests/
-│   ├── conftest.py
-│   ├── test_models.py
-│   ├── test_prompt_parser.py
-│   ├── test_output_validator.py
-│   ├── test_spec_builder.py
-│   ├── test_embeddings.py
-│   ├── test_data_cleaner.py
-│   ├── test_research_fetcher.py
-│   └── test_integration.py
-│
-├── docs/
-│   └── sample_spec.json
-├── requirements.txt
-└── .env.example
-```
+- `orchestrator/`
+  - `prompt_parser.py` — parse prompt to structured crop, location, and stress data
+  - `workflow.py` — pipeline controller with retry state machine
+  - `research_fetcher.py` — Semantic Scholar / ArXiv research integration
+  - `spec_builder.py` — build final spec JSON from traits, research, and prompt
+  - `output_validator.py` — validate and serialize specification
+
+- `search_engine/`
+  - `embeddings.py` — generate semantic vectors with SentenceTransformers
+  - `vector_store.py` — manage ChromaDB trait index
+  - `similarity_search.py` — semantic search over crop trait vectors
+  - `data_cleaner.py` — normalize trait data and remove bad records
+
+- `shared/`
+  - `models.py` — shared Pydantic schema definitions
+  - `config.py` — environment-driven configuration
+
+- `ui/`
+  - `app.py` — Streamlit interface for prompt entry and pipeline debugging
 
 ---
 
-## Quick Start
+## Setup
+
+### 1. Install dependencies
 
 ```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+cd JAY
+python -m pip install -r requirements.txt
+```
 
-# 2. Configure environment
-cp .env.example .env
-# Edit .env — add API keys, model paths
+### 2. Configure environment
 
-# 3. Populate the vector database (first run only)
-python search_engine/vector_store.py
+```bash
+copy .env.example .env
+```
 
-# 4. Launch the UI
-streamlit run ui/app.py
+Then edit `.env` with your values.
+
+Important variables:
+
+- `OLLAMA_BASE_URL` / `OLLAMA_MODEL` — local LLM endpoint
+- `CHROMA_HOST` / `CHROMA_PORT` — ChromaDB configuration
+- `EMBEDDING_MODEL` — embedding model name
+- `SEMANTIC_SCHOLAR_KEY` — research API key
+- `MAX_RETRIES`, `SEARCH_TOP_K`, `MIN_CONFIDENCE`
+
+### 3. Run the UI
+
+From the repository root:
+
+```bash
+cd d:\jayvardhan-space\PRANAG-AI
+set PYTHONPATH=%cd%
+venv\Scripts\streamlit.exe run JAY\ui\app.py
+```
+
+> Running from the repository root with `PYTHONPATH` set ensures the `JAY`
+> package imports resolve correctly.
+
+---
+
+## Notes
+
+- The UI uses a fallback parser when Ollama is unavailable.
+- The vector store uses ChromaDB; local embedded mode is the default.
+- If research APIs are unreachable, the pipeline falls back to mock insights.
+
+---
+
+## Testing
+
+Run project tests from the repository root:
+
+```bash
+cd d:\jayvardhan-space\PRANAG-AI
+set PYTHONPATH=%cd%
+venv\Scripts\python.exe -m pytest JAY\tests -v
 ```
 
 ---
 
-## Input / Output Example
+## Example
 
-**Input prompt:**
-```
+Prompt:
+
+```text
 wheat for Jodhpur at 48°C
 ```
 
-**Output `spec.json`:**
-```json
-{
-  "crop_type": "wheat",
-  "location": { "city": "Jodhpur", "climate_zone": "arid" },
-  "conditions": { "temperature_max": 48.0, "stress_type": "heat" },
-  "confidence_score": 0.87,
-  "validation_passed": true
-}
-```
+Resulting spec includes crop type, location, climate stress, trait matches,
+research insights, and a confidence score.
