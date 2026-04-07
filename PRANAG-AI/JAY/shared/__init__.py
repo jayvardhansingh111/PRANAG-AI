@@ -1,0 +1,3 @@
+# shared/__init__.py
+# Makes 'shared' a proper Python package so it can be imported
+# from anywhere in the project as:  from shared.models import ...
