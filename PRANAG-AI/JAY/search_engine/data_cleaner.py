@@ -1,8 +1,3 @@
-# search_engine/data_cleaner.py
-# Cleans raw Parquet trait data before embedding.
-# Pipeline: Load → Validate Schema → Handle Missing → Fix Units
-#           → Remove Outliers → Deduplicate → Normalize Strings → Output
-
 from typing import List, Dict, Any, Tuple, Optional
 import time
 
