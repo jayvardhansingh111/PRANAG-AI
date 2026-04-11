@@ -1,0 +1,17 @@
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+
+
+# IDE files
+.vscode/
+.idea/
+
+pyproject.toml
