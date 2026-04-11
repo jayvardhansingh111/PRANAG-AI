@@ -8,10 +8,9 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
-
-
 # IDE files
 .vscode/
 .idea/
 
 pyproject.toml
+.env.example
